@@ -17,6 +17,9 @@ static VALUE parse_line(VALUE self, VALUE str)
     
     const char *ptr = RSTRING_PTR(str);
     int len = (int) RSTRING_LEN(str);  /* cast to prevent warning in 64-bit OS */
+
+    if (len == 0)
+        return Qnil;
     
     VALUE array = rb_ary_new2(DEF_ARRAY_LEN); 
     char value[len];  /* field value, no longer than line */
@@ -31,7 +34,7 @@ static VALUE parse_line(VALUE self, VALUE str)
         {
             case ',':
                 if (state == 0) {
-                    rb_ary_push(array, rb_str_new(value, index));
+                    rb_ary_push(array, (index == 0 ? Qnil: rb_str_new(value, index)));
                     index = 0;
                 }
                 else if (state == 1) {
@@ -57,19 +60,31 @@ static VALUE parse_line(VALUE self, VALUE str)
                 break;
             case 13:  /* \r */
             case 10:  /* \n */
-                /* eat it */
+                if (state == 1) { /* quoted */
+                    value[index++] = c;
+                }
+                else {
+                    /* only do first line */
+                    i = len;
+                }
+                /* else eat it ??? or return so far */
                 break;
             default:
                 value[index++] = c;
         }
     }
     
-    rb_ary_push(array, rb_str_new(value, index));
+    if (state == 0) {
+        rb_ary_push(array, (index == 0 ? Qnil: rb_str_new(value, index)));
+    }
+    else if (state == 2) {
+        rb_ary_push(array, rb_str_new(value, index));
+    }
     return array;
 }
 
 void Init_csv_parser()
 {
-    cFastestCSV = rb_define_class("FastestCSV");
+    cFastestCSV = rb_define_class("FastestCSV", rb_cObject);
     rb_define_singleton_method(cFastestCSV, "parse_line", parse_line, 1);
 }

@@ -1,4 +1,5 @@
 require 'csv_parser'
+require 'stringio'
 
 class FastestCSV
   
@@ -11,16 +12,37 @@ class FastestCSV
 
   # This method opens a csv file. It will pass a Reader object to the provided block,
   # or return a Reader object when no block is provided.
-  def self.open(path)
-    reader = new(File.open(path, 'r'))
+  def self.open(path, mode = "rb")
+    csv = new(File.open(path, mode))
     if block_given?
       begin
-        yield reader
+        yield csv
       ensure
-        reader.close
+        csv.close
       end
     else
-      reader
+      csv
+    end
+  end
+
+  def self.read(path)
+    open(path, "rb") { |csv| csv.read }
+  end
+
+  def self.readlines(path)
+    read(path)
+  end
+
+  def self.parse(data, &block)
+    csv = new(StringIO.new(data))
+    if block.nil?  # slurp contents, if no block is given
+      begin
+        csv.read
+      ensure
+        csv.close
+      end
+    else           # or pass each row to a provided block
+      csv.each(&block)
     end
   end
 
@@ -33,6 +55,13 @@ class FastestCSV
       yield row
     end
   end
+  
+  def read
+    table = Array.new
+    each {|row| table << row}
+    table
+  end
+  alias_method :readlines, :read
 
   def shift
     if line = @io.gets
@@ -47,4 +76,16 @@ class FastestCSV
   def close
     @io.close
   end
+  
+  def closed?
+    @io.closed?
+  end
 end
+
+class String
+  # Equivalent to <tt>FasterCSV::parse_line(self, options)</tt>.
+  def parse_csv
+    FastestCSV.parse_line(self)
+  end
+end
+
