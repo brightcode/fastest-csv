@@ -2,8 +2,6 @@ require 'csv_parser'
 
 class FastestCSV
   
-  VERSION = "0.0.1".freeze
-    
   # This method opens an accounting file and passes each record to the provided +block+.
   def self.foreach(path, &block)
     open(path) do |reader|
