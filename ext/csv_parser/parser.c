@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) Maarten Oelering, BrightCode BV
+ */
+
 #include "ruby.h"
 #ifdef RUBY_18
   #include "rubyio.h"

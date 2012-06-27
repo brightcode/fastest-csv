@@ -1,6 +1,14 @@
-# FastestCsv
+# FastestCSV
 
-TODO: Write a gem description
+Fastest CSV class for MRI Ruby. Faster than faster_csv and fasterer-csv. 
+
+Uses native C code to parse CSV lines. Not (yet) compatible with JRuby.
+
+Supports standard CSV according to RFC4180. Not the so-called "csv" from Excel.
+
+The interface is a subset of the CSV interface in Ruby 1.9.3. The options parameter is not supported.
+
+Originally developed to parse large CSV log files from PowerMTA.
 
 ## Installation
 
