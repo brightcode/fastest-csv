@@ -26,7 +26,38 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Parse single line
+
+    FastestCSV.parse_line("one,two,three")
+     => ["one", "two", "three"]
+    
+    "one,two,three".parse_csv
+     => ["one", "two", "three"]
+
+Parse file without header
+
+    FastestCSV.foreach("path/to/file.csv") do |row|
+      while row = csv.shift
+        #
+      end
+    end
+
+Parse file with header
+
+    FastestCSV.open("path/to/file.csv") do |csv|
+      fields = csv.shift
+      while values = csv.shift
+        # 
+      end
+    end
+
+Parse file in array of arrays
+
+    rows = FastestCSV.read("path/to/file.csv")
+
+Parse string in array of arrays
+
+    rows = FastestCSV.parse(csv_data)
 
 ## Contributing
 

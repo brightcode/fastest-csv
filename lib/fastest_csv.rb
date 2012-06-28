@@ -35,13 +35,13 @@ class FastestCSV
 
   def self.parse(data, &block)
     csv = new(StringIO.new(data))
-    if block.nil?  # slurp contents, if no block is given
+    if block.nil?
       begin
         csv.read
       ensure
         csv.close
       end
-    else           # or pass each row to a provided block
+    else
       csv.each(&block)
     end
   end
