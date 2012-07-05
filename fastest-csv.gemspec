@@ -16,4 +16,6 @@ Gem::Specification.new do |gem|
   gem.version       = FastestCSV::VERSION
   
   gem.extensions    = ['ext/csv_parser/extconf.rb']
+  
+  gem.add_development_dependency "rake-compiler"
 end

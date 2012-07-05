@@ -1,17 +1,18 @@
 require 'csv_parser'
 require 'stringio'
 
+# Fast CSV parser using native code
 class FastestCSV
   
-  # This method opens an accounting file and passes each record to the provided +block+.
+  # Pass each line of the specified +path+ as array to the provided +block+
   def self.foreach(path, &block)
     open(path) do |reader|
       reader.each(&block)
     end
   end
 
-  # This method opens a csv file. It will pass a Reader object to the provided block,
-  # or return a Reader object when no block is provided.
+  # Opens a csv file. Pass a FastestCSV instance to the provided block,
+  # or return it when no block is provided
   def self.open(path, mode = "rb")
     csv = new(File.open(path, mode))
     if block_given?
@@ -25,14 +26,17 @@ class FastestCSV
     end
   end
 
+  # Read all lines from the specified +path+ into an array of arrays
   def self.read(path)
     open(path, "rb") { |csv| csv.read }
   end
 
+  # Alias for FastestCSV.read
   def self.readlines(path)
     read(path)
   end
 
+  # Read all lines from the specified String into an array of arrays
   def self.parse(data, &block)
     csv = new(StringIO.new(data))
     if block.nil?
@@ -46,16 +50,19 @@ class FastestCSV
     end
   end
 
+  # Create new FastestCSV wrapping the specified IO object
   def initialize(io)
     @io = io
   end
   
+  # Read from the wrapped IO passing each line as array to the specified block
   def each
     while row = shift
       yield row
     end
   end
   
+  # Read all remaining lines from the wrapped IO into an array of arrays
   def read
     table = Array.new
     each {|row| table << row}
@@ -63,6 +70,7 @@ class FastestCSV
   end
   alias_method :readlines, :read
 
+  # Read next line from the wrapped IO and return as array or nil at EOF
   def shift
     if line = @io.gets
       FastestCSV.parse_line(line)
@@ -73,6 +81,7 @@ class FastestCSV
   alias_method :gets,     :shift
   alias_method :readline, :shift
   
+  # Close the wrapped IO
   def close
     @io.close
   end
@@ -83,7 +92,7 @@ class FastestCSV
 end
 
 class String
-  # Equivalent to <tt>FasterCSV::parse_line(self, options)</tt>.
+  # Equivalent to <tt>FasterCSV::parse_line(self)</tt>
   def parse_csv
     FastestCSV.parse_line(self)
   end
