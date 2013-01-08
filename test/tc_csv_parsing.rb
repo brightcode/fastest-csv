@@ -17,7 +17,7 @@ class TestCSVParsing < Test::Unit::TestCase
     ex = %Q{Ten Thousand,10000, 2710 ,,"10,000","It's ""10 Grand"", baby",10K}
     assert_equal( [ "Ten Thousand", "10000", " 2710 ", nil, "10,000",
                     "It's \"10 Grand\", baby", "10K" ],
-                  FastestCSV.parse_line(ex) )
+                  CsvParser.parse_line(ex) )
   end
 
   # Pulled from:  http://www.ruby-lang.org/cgi-bin/cvsweb.cgi/ruby/test/csv/test_csv.rb?rev=1.12.2.2;content-type=text%2Fplain
@@ -49,7 +49,7 @@ class TestCSVParsing < Test::Unit::TestCase
       ["foo,\"\r\n\n\",baz", ["foo", "\r\n\n", "baz"]],
       ["foo,\"foo,bar\",baz", ["foo", "foo,bar", "baz"]],
       [";,;", [";", ";"]] ].each do |csv_test|
-      assert_equal(csv_test.last, FastestCSV.parse_line(csv_test.first))
+      assert_equal(csv_test.last, CsvParser.parse_line(csv_test.first))
     end
     
     [ ["foo,\"\"\"\"\"\",baz", ["foo", "\"\"", "baz"]],
@@ -68,7 +68,7 @@ class TestCSVParsing < Test::Unit::TestCase
       ["foo,bar", ["foo", "bar"]],
       ["foo,\"\r\n\n\",baz", ["foo", "\r\n\n", "baz"]],
       ["foo,\"foo,bar\",baz", ["foo", "foo,bar", "baz"]] ].each do |csv_test|
-      assert_equal(csv_test.last, FastestCSV.parse_line(csv_test.first))
+      assert_equal(csv_test.last, CsvParser.parse_line(csv_test.first))
      end
   end
 
@@ -91,20 +91,20 @@ class TestCSVParsing < Test::Unit::TestCase
       [%Q{,"\r"},             [nil,"\r"]],
       [%Q{"\r\n,"},           ["\r\n,"]],
       [%Q{"\r\n,",},          ["\r\n,", nil]] ].each do |edge_case|
-        assert_equal(edge_case.last, FastestCSV.parse_line(edge_case.first))
+        assert_equal(edge_case.last, CsvParser.parse_line(edge_case.first))
       end
   end
 
   def test_james_edge_cases
     # A read at eof? should return nil.
-    assert_equal(nil, FastestCSV.parse_line(""))
+    assert_equal(nil, CsvParser.parse_line(""))
     # 
     # With CSV it's impossible to tell an empty line from a line containing a
     # single +nil+ field.  The standard CSV library returns <tt>[nil]</tt>
     # in these cases, but <tt>Array.new</tt> makes more sense to me.
     # 
     #assert_equal(Array.new, FastestCSV.parse_line("\n1,2,3\n"))
-    assert_equal([nil], FastestCSV.parse_line("\n1,2,3\n"))
+    assert_equal([nil], CsvParser.parse_line("\n1,2,3\n"))
   end
 
   def test_rob_edge_cases
@@ -119,7 +119,7 @@ class TestCSVParsing < Test::Unit::TestCase
       [%Q{"a\r\n\r\na","two CRLFs"},       ["a\r\n\r\na", 'two CRLFs']],
       [%Q{with blank,"start\n\nfinish"\n}, ['with blank', "start\n\nfinish"]],
     ].each do |edge_case|
-      assert_equal(edge_case.last, FastestCSV.parse_line(edge_case.first))
+      assert_equal(edge_case.last, CsvParser.parse_line(edge_case.first))
     end
   end
 

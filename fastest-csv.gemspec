@@ -14,8 +14,13 @@ Gem::Specification.new do |gem|
   gem.name          = "fastest-csv"
   gem.require_paths = ["lib"]
   gem.version       = FastestCSV::VERSION
-  
-  gem.extensions    = ['ext/csv_parser/extconf.rb']
+
+  if RUBY_PLATFORM =~ /java/
+    gem.platform = "java"
+    gem.files << "lib/csv_parser.jar"
+  else
+    gem.extensions  = ['ext/csv_parser/extconf.rb']
+  end
   
   gem.add_development_dependency "rake-compiler"
 end

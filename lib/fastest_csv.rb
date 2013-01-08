@@ -1,9 +1,16 @@
+# This loads either csv_parser.so, csv_parser.bundle or
+# csv_parser.jar, depending on your Ruby platform and OS
 require 'csv_parser'
 require 'stringio'
 
 # Fast CSV parser using native code
 class FastestCSV
   
+  if RUBY_PLATFORM =~ /java/
+    require 'jruby'
+    org.brightcode.CsvParserService.new.basicLoad(JRuby.runtime)
+  end
+
   # Pass each line of the specified +path+ as array to the provided +block+
   def self.foreach(path, &block)
     open(path) do |reader|
@@ -49,6 +56,10 @@ class FastestCSV
       csv.each(&block)
     end
   end
+  
+  def self.parse_line(line)
+    ::CsvParser.parse_line(line)
+  end
 
   # Create new FastestCSV wrapping the specified IO object
   def initialize(io)
@@ -73,7 +84,7 @@ class FastestCSV
   # Read next line from the wrapped IO and return as array or nil at EOF
   def shift
     if line = @io.gets
-      FastestCSV.parse_line(line)
+      ::CsvParser.parse_line(line)
     else
       nil
     end
@@ -94,7 +105,7 @@ end
 class String
   # Equivalent to <tt>FasterCSV::parse_line(self)</tt>
   def parse_csv
-    FastestCSV.parse_line(self)
+    ::CsvParser.parse_line(self)
   end
 end
 

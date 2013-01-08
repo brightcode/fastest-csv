@@ -12,7 +12,10 @@
 /* default allocated size is 16 */
 #define DEF_ARRAY_LEN 32
 
+/*
 static VALUE cFastestCSV;
+*/
+static VALUE mCsvParser;
 
 static VALUE parse_line(VALUE self, VALUE str)
 {
@@ -89,6 +92,10 @@ static VALUE parse_line(VALUE self, VALUE str)
 
 void Init_csv_parser()
 {
+    /*
     cFastestCSV = rb_define_class("FastestCSV", rb_cObject);
     rb_define_singleton_method(cFastestCSV, "parse_line", parse_line, 1);
+    */
+    mCsvParser = rb_define_module("CsvParser");
+    rb_define_module_function(mCsvParser, "parse_line", parse_line, 1);
 }
