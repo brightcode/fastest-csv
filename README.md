@@ -1,8 +1,8 @@
 # FastestCSV
 
-Fastest CSV class for MRI Ruby. Faster than faster_csv and fasterer-csv. 
+Fastest CSV class for MRI Ruby and JRuby. Faster than faster_csv and fasterer-csv. 
 
-Uses native C code to parse CSV lines. Not (yet) compatible with JRuby.
+Uses native C code to parse CSV lines in MRI Ruby and Java in JRuby.
 
 Supports standard CSV according to RFC4180. Not the so-called "csv" from Excel.
 

@@ -12,6 +12,10 @@
 /* default allocated size is 16 */
 #define DEF_ARRAY_LEN 32
 
+#define UNQUOTED 0
+#define IN_QUOTED 1
+#define QUOTE_IN_QUOTED 2
+
 /*
 static VALUE cFastestCSV;
 */
@@ -40,51 +44,49 @@ static VALUE parse_line(VALUE self, VALUE str)
         switch (c)
         {
             case ',':
-                if (state == 0) {
+                if (state == UNQUOTED) {
                     rb_ary_push(array, (index == 0 ? Qnil: rb_str_new(value, index)));
                     index = 0;
                 }
-                else if (state == 1) {
+                else if (state == IN_QUOTED) {
                     value[index++] = c;
                 }
-                else if (state == 2) {
+                else if (state == QUOTE_IN_QUOTED) {
                     rb_ary_push(array, rb_str_new(value, index));
                     index = 0;
-                    state = 0;  /* outside quoted */
+                    state = UNQUOTED;
                 }
                 break;
             case '"':
-                if (state == 0) {
-                    state = 1;  /* in quoted */
+                if (state == UNQUOTED) {
+                    state = IN_QUOTED;
                 }
                 else if (state == 1) {
-                    state = 2;  /* quote in quoted */
+                    state = QUOTE_IN_QUOTED;
                 }
-                else if (state == 2) {
+                else if (state == QUOTE_IN_QUOTED) {
                     value[index++] = c;  /* escaped quote */
-                    state = 1;  /* in quoted */
+                    state = IN_QUOTED;
                 }
                 break;
             case 13:  /* \r */
             case 10:  /* \n */
-                if (state == 1) { /* quoted */
+                if (state == IN_QUOTED) {
                     value[index++] = c;
                 }
                 else {
-                    /* only do first line */
-                    i = len;
+                    i = len;  /* only parse first line if multiline */
                 }
-                /* else eat it ??? or return so far */
                 break;
             default:
                 value[index++] = c;
         }
     }
     
-    if (state == 0) {
+    if (state == UNQUOTED) {
         rb_ary_push(array, (index == 0 ? Qnil: rb_str_new(value, index)));
     }
-    else if (state == 2) {
+    else if (state == QUOTE_IN_QUOTED) {
         rb_ary_push(array, rb_str_new(value, index));
     }
     return array;

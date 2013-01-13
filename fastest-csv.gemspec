@@ -4,8 +4,8 @@ require File.expand_path('../lib/fastest-csv/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Maarten Oelering"]
   gem.email         = ["maarten@brightcode.nl"]
-  gem.description   = %q{Fastest standard CSV parser for MRI Ruby}
-  gem.summary       = %q{Fastest standard CSV parser for MRI Ruby}
+  gem.description   = %q{Fastest standard CSV parser for MRI Ruby and JRuby}
+  gem.summary       = %q{Fastest standard CSV parser for MRI Ruby and JRuby}
   gem.homepage      = "https://github.com/brightcode/fastest-csv"
 
   gem.files         = `git ls-files`.split($\)
