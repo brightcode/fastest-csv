@@ -5,6 +5,7 @@ require 'stringio'
 
 # Fast CSV parser using native code
 class FastestCSV
+  include Enumerable
   
   if RUBY_PLATFORM =~ /java/
     require 'jruby'
