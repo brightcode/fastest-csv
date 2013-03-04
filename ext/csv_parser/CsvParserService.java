@@ -19,6 +19,8 @@ public class CsvParserService implements BasicLibraryService {
 
     private Ruby runtime;
 
+    private static int DEF_ARRAY_LEN = 32;
+
     private static int UNQUOTED = 0;
     private static int IN_QUOTED = 1;
     private static int QUOTE_IN_QUOTED = 2;
@@ -45,7 +47,7 @@ public class CsvParserService implements BasicLibraryService {
         
         int state = UNQUOTED;
         StringBuilder value = new StringBuilder(length);   // field value, no longer than line
-        RubyArray array = RubyArray.newArray(runtime, 36);
+        RubyArray array = RubyArray.newArray(runtime, DEF_ARRAY_LEN);
         
         for (int i = 0; i < length; i++) {
             char c = seq.charAt(i);

@@ -116,4 +116,13 @@ class TestFastestCSVInterface < Test::Unit::TestCase
     @expected = [%w{1 2} + ['3' * long_field_length]]
     test_shift
   end
+  
+  def test_enumerable
+    FastestCSV.open(@path) do |csv|
+      assert(csv.include?(["1", "2", "3"]))
+      csv.rewind
+      assert_equal([["1", "2", "3"], ["4", "5"]], csv.to_a)
+    end
+  end
+  
 end

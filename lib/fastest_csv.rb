@@ -69,8 +69,12 @@ class FastestCSV
   
   # Read from the wrapped IO passing each line as array to the specified block
   def each
-    while row = shift
-      yield row
+    if block_given?
+      while row = shift
+        yield row
+      end
+    else
+      to_enum # return enumerator
     end
   end
   
@@ -81,6 +85,11 @@ class FastestCSV
     table
   end
   alias_method :readlines, :read
+  
+  # Rewind the underlying IO object and reset line counter
+  def rewind
+    @io.rewind
+  end
 
   # Read next line from the wrapped IO and return as array or nil at EOF
   def shift
