@@ -4,20 +4,10 @@
 
 package org.brightcode;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.jruby.Ruby;
-import org.jruby.RubyArray;
-import org.jruby.RubyModule;
-import org.jruby.RubyString;
-import org.jruby.runtime.Block;
-import org.jruby.runtime.CallbackFactory;
-import org.jruby.runtime.builtin.IRubyObject;
-import org.jruby.runtime.load.BasicLibraryService;
-
-public class CsvParserService implements BasicLibraryService {
-
-    private Ruby runtime;
+public class CsvParser {
 
     private static int DEF_ARRAY_LEN = 32;
 
@@ -25,41 +15,25 @@ public class CsvParserService implements BasicLibraryService {
     private static int IN_QUOTED = 1;
     private static int QUOTE_IN_QUOTED = 2;
     
-    // Initial setup function. Takes a reference to the current JRuby runtime and
-    // sets up our modules.
-    public boolean basicLoad(Ruby runtime) throws IOException {
-        this.runtime = runtime;
-
-        RubyModule mCsvParser = runtime.defineModule("CsvParser");
-        // TODO: CallbackFactory#getSingletonMethod is deprecated
-        CallbackFactory callbackFactory = runtime.callbackFactory(CsvParserService.class);
-        mCsvParser.defineModuleFunction("parse_line", 
-            callbackFactory.getSingletonMethod("parseLine", RubyString.class));
-        return true;
-    }
-    
-    public static IRubyObject parseLine(IRubyObject recv, RubyString line, Block unusedBlock) {
-        Ruby runtime = recv.getRuntime();
- 
-        CharSequence seq = line.getValue();
-        int length = seq.length();
+    public static List parseLine(String line) {
+        int length = line.length();
         if (length == 0)
-            return runtime.getNil();
+            return null;
         
         int state = UNQUOTED;
         StringBuilder value = new StringBuilder(length);   // field value, no longer than line
-        RubyArray array = RubyArray.newArray(runtime, DEF_ARRAY_LEN);
+        List<String> array = new ArrayList<String>(DEF_ARRAY_LEN);
         
         for (int i = 0; i < length; i++) {
-            char c = seq.charAt(i);
+            char c = line.charAt(i);
             switch (c) {
                 case ',':
                     if (state == UNQUOTED) {
                         if (value.length() == 0) {
-                            array.append(runtime.getNil());
+                            array.add(null);
                         } 
                         else {
-                            array.append(RubyString.newString(runtime, value));
+                            array.add(value.toString());
                             value.setLength(0);
                         }
                     }
@@ -67,7 +41,7 @@ public class CsvParserService implements BasicLibraryService {
                         value.append(c);
                     }
                     else if (state == 2) {
-                        array.append(RubyString.newString(runtime, value));
+                        array.add(value.toString());
                         value.setLength(0);
                         state = UNQUOTED;
                     }
@@ -100,15 +74,15 @@ public class CsvParserService implements BasicLibraryService {
         }
         if (state == UNQUOTED) {
             if (value.length() == 0) {
-                array.append(runtime.getNil());
+                array.add(null);
             } 
             else {
-                array.append(RubyString.newString(runtime, value));
+                array.add(value.toString());
                 value.setLength(0);
             }
         }
         else if (state == QUOTE_IN_QUOTED) {
-            array.append(RubyString.newString(runtime, value));
+            array.add(value.toString());
         }
         return array;
     }

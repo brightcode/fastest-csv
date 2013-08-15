@@ -8,8 +8,12 @@ class FastestCSV
   include Enumerable
   
   if RUBY_PLATFORM =~ /java/
-    require 'jruby'
-    org.brightcode.CsvParserService.new.basicLoad(JRuby.runtime)
+    if JRUBY_VERSION =~ /^1\.[0-6]/
+      require 'jruby'
+      org.brightcode.CsvParserService.new.basicLoad(JRuby.runtime)
+    else
+      include_package "org.brightcode"
+    end
   end
 
   # Pass each line of the specified +path+ as array to the provided +block+
@@ -59,7 +63,7 @@ class FastestCSV
   end
   
   def self.parse_line(line)
-    ::CsvParser.parse_line(line)
+    CsvParser.parse_line(line)
   end
 
   # Create new FastestCSV wrapping the specified IO object
@@ -94,7 +98,7 @@ class FastestCSV
   # Read next line from the wrapped IO and return as array or nil at EOF
   def shift
     if line = @io.gets
-      ::CsvParser.parse_line(line)
+      CsvParser.parse_line(line)
     else
       nil
     end
@@ -115,7 +119,7 @@ end
 class String
   # Equivalent to <tt>FasterCSV::parse_line(self)</tt>
   def parse_csv
-    ::CsvParser.parse_line(self)
+    CsvParser.parse_line(self)
   end
 end
 

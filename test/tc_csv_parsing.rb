@@ -13,6 +13,10 @@ require 'fastest_csv'
 # 
 class TestCSVParsing < Test::Unit::TestCase
 
+  if RUBY_PLATFORM =~ /java/
+    include_package "org.brightcode"
+  end
+
   def test_mastering_regex_example
     ex = %Q{Ten Thousand,10000, 2710 ,,"10,000","It's ""10 Grand"", baby",10K}
     assert_equal( [ "Ten Thousand", "10000", " 2710 ", nil, "10,000",
