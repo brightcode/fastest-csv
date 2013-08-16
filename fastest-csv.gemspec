@@ -23,4 +23,6 @@ Gem::Specification.new do |gem|
   end
   
   gem.add_development_dependency "rake-compiler"
+  
+  gem.license = 'MIT'
 end
