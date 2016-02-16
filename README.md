@@ -37,9 +37,7 @@ Parse single line
 Parse file without header
 
     FastestCSV.foreach("path/to/file.csv") do |row|
-      while row = csv.shift
-        #
-      end
+      #
     end
 
 Parse file with header
